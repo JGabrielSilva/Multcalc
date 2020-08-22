@@ -1,24 +1,38 @@
 from kivy.app import App
-from kivy.uix.label import Label
-from kivy.uix.gridlayout import GridLayout
-from kivy.uix.textinput import TextInput
+from kivy.uix.widget import Widget
+from kivy.uix.button import Button
+from kivy.uix.boxlayout import BoxLayout
+from kivy.properties import ListProperty
 
-class LoginScreen(GridLayout):
+class CustomBtn(Widget):
+    pressed = ListProperty([0, 0])
+
+    def on_touch_down(self, touch):
+        if self.collide_point(*touch.pos):
+            self.pressed = touch.pos
+            return True
+        return super(CustomBtn, self).on_touch_down(touch)
+    
+    def on_pressed(self, instance, pos):
+        print(f'pressed at {pos}')
+
+
+class RootWidget(BoxLayout):
     def __init__(self, **kwargs):
-        super(LoginScreen, self).__init__(**kwargs)
-        self.cols = 2
-        self.add_widget(Label(text='User name'))
-        self.username = TextInput(multiline=False)
-        self.add_widget(self.username)
-        self.add_widget(Label(text='Password'))
-        self.password = TextInput(multiline=False)
-        self.add_widget(self.password)
+        super(RootWidget, self).__init__(**kwargs)
+        self.add_widget(Button(text='btn 1'))
+        cb = CustomBtn() 
+        cb.bind(pressed=self.btn_pressed)
+        self.add_widget(cb)
+        self.add_widget(Button(text='btn 2'))
+    
+    def btn_pressed(self, instance, pos):
+        print(f'pos: printed from root widget: {pos}')
 
 
-class Myapp(App):
+class TestApp(App):
     def build(self):
-        return LoginScreen()
-
+        return RootWidget()
 
 if __name__ == "__main__":
-    Myapp().run()
+    TestApp().run()
